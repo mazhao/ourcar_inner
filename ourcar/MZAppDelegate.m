@@ -7,14 +7,53 @@
 //
 
 #import "MZAppDelegate.h"
+#import "MZLeftViewController.h"
+#import "MZRightViewController.h"
+#import "MZCenterViewController.h"
+#import "MZBaseNavigationController.h"
+#import "MMDrawerController.h"
+
+
+@interface MZAppDelegate ()
+@property (nonatomic,strong) MMDrawerController * drawerController;
+
+@end
+
 
 @implementation MZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    UIViewController * leftvc = [[MZLeftViewController alloc] init];
+    
+    UIViewController * centervc = [[MZCenterViewController alloc] init];
+    UINavigationController * centernc = [[MZBaseNavigationController alloc] initWithRootViewController:centervc];
+    
+    if(OSVersionIsAtLeastiOS7()){
+        UINavigationController * leftSideNavController = [[MZBaseNavigationController alloc] initWithRootViewController:leftvc];
+      
+        self.drawerController = [[MMDrawerController alloc] initWithCenterViewController:centernc leftDrawerViewController:leftSideNavController];
+        [self.drawerController setShowsShadow:NO];
+    } else {
+        self.drawerController = [[MMDrawerController alloc]
+                                 initWithCenterViewController:centernc
+                                 leftDrawerViewController:leftvc ];
+    }
+    [self.drawerController setMaximumLeftDrawerWidth:280.0f];
+    [self.drawerController setOpenDrawerGestureModeMask:MMOpenDrawerGestureModeAll];
+    [self.drawerController setCloseDrawerGestureModeMask:MMCloseDrawerGestureModeAll];
+    
+   
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
+    if(OSVersionIsAtLeastiOS7()){
+        UIColor * tintColor = [UIColor colorWithRed:29.0/255.0
+                                              green:173.0/255.0
+                                               blue:234.0/255.0
+                                              alpha:1.0];
+        [self.window setTintColor:tintColor];
+    }
+    [self.window setRootViewController:self.drawerController];
     [self.window makeKeyAndVisible];
     return YES;
 }
